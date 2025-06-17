@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='document',
             name='active_at',
-            field=models.DateTimeField(null=True),
+            field=models.DateTimeField(blank=True, null=True),
         ),
     ]

@@ -9,7 +9,7 @@ class Document(models.Model):
     title = models.CharField(max_length=255, default="Untitled")
     content = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=True)
-    active_at = models.DateTimeField(auto_now_add=False, auto_now=False, null=True)
+    active_at = models.DateTimeField(auto_now_add=False, auto_now=False, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
