@@ -5,13 +5,14 @@ from documents.models import Document
 
 @tool
 def list_documents(config: RunnableConfig):
-    """Get documents for the current user"""
-    print(config)
-    metadata = config.get('metadata') or config.get('configurable')
+    """List the most recent 5 documents for the current user"""
+    limit = 5
+    metadata = config.get('configurable') or config.get('metadata')
     user_id = metadata.get('user_id')
-    qs = Document.objects.filter(owner_id=user_id, active=True)
+
+    qs = Document.objects.filter(owner_id=user_id, active=True).order_by("-created_at")
     response_data = []
-    for document in qs:
+    for document in qs[:limit]:
         response_data.append({
             "id": document.id,
             "title": document.title,
@@ -22,7 +23,7 @@ def list_documents(config: RunnableConfig):
 @tool
 def get_document(config: RunnableConfig, document_id: int):
     """Get the details of a document by id"""
-    metadata = config.get('metadata') or config.get('configurable')
+    metadata = config.get('configurable') or config.get('metadata') 
     user_id = metadata.get('user_id')
     try:
         document = Document.objects.get(id=document_id, owner_id=user_id, active=True)
@@ -35,3 +36,9 @@ def get_document(config: RunnableConfig, document_id: int):
             "title": document.title,
         }
     return response_data
+
+
+document_tools = [
+    list_documents,
+    get_document,
+]
