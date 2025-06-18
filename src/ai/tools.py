@@ -1,6 +1,37 @@
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
 from documents.models import Document
+from django.db.models import Q
+
+
+@tool
+def search_query_documents(config: RunnableConfig, query: str, limit: int = 5):
+    """Search the most recent LIMIT documents for the current user  with maximum of 25.
+
+    arguments:
+    query: string or lookup search across title or content of document
+    limit: number of results"""
+    if limit > 25:
+        limit = 25
+
+    metadata = config.get('configurable') or config.get('metadata')
+    user_id = metadata.get('user_id')
+
+    default_lookups = {
+        "active": True,
+        "owner_id": user_id,
+    }
+
+    qs = Document.objects.filter(**default_lookups).filter(
+            Q(title__icontains=query) | Q(content__icontains=query)
+        ).order_by("-created_at")
+    response_data = []
+    for document in qs[:limit]:
+        response_data.append({
+            "id": document.id,
+            "title": document.title,
+        })
+    return response_data
 
 
 @tool
@@ -99,7 +130,7 @@ def delete_document(config: RunnableConfig, document_id: int):
 
 
 @tool
-def update_document(config: RunnableConfig, document_id:int, title:str =None, content:str = None):
+def update_document(config: RunnableConfig, document_id: int, title: str = None, content: str = None):
     """ updae a document for the current user
 
     Args:
@@ -151,5 +182,6 @@ document_tools = [
     get_document,
     create_document,
     delete_document,
-    update_document
+    update_document,
+    search_query_documents
 ]
