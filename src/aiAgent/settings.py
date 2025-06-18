@@ -124,8 +124,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 OPENAI_API_KEY = config("OPENAI_API_KEY", default=None)
+ANTHROPIC_API_KEY = config("ANTHROPIC_API_KEY", default=None)
+GOOGLE_API_KEY = config("GOOGLE_API_KEY", default=None)
+AZURE_OPENAI_API_KEY = config("AZURE_OPENAI_API_KEY", default=None)
+AZURE_OPENAI_ENDPOINT = config("AZURE_OPENAI_ENDPOINT", default=None)
+OPENAI_API_VERSION = config("OPENAI_API_VERSION", default=None)
 
 TMDB_API_KEY = config("TMDB_API_KEY", default=None)
-
 PERMIT_API_KEY = config("PERMIT_API_KEY", default=None)
 PERMIT_PDP_URL = config("PERMIT_PDP_URL", default="https://cloudpdp.api.permit.io")
