@@ -2,6 +2,8 @@ from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
 from documents.models import Document
 from django.db.models import Q
+from mypermit import permit_client as permit
+from asgiref.sync import async_to_sync
 
 
 @tool
@@ -18,9 +20,12 @@ def search_query_documents(config: RunnableConfig, query: str, limit: int = 5):
     user_id = metadata.get('user_id')
 
     default_lookups = {
-        "active": True,
-        "owner_id": user_id,
+        "active": True
     }
+
+    has_perms = async_to_sync(permit.check)(f"{user_id}", "read", "document")
+    if not has_perms:
+        raise Exception("You do not have permission to do search the documents")
 
     qs = Document.objects.filter(**default_lookups).filter(
             Q(title__icontains=query) | Q(content__icontains=query)
@@ -41,8 +46,11 @@ def list_documents(config: RunnableConfig):
     metadata = config.get('configurable') or config.get('metadata')
     user_id = metadata.get('user_id')
 
-    qs = Document.objects.filter(
-        owner_id=user_id, active=True).order_by("-created_at")
+    has_perms = async_to_sync(permit.check)(f"{user_id}", "read", "document")
+    if not has_perms:
+        raise Exception("You do not have permission to list all documents.")
+
+    qs = Document.objects.filter(active=True).order_by("-created_at")
     response_data = []
     for document in qs[:limit]:
         response_data.append({
@@ -57,9 +65,13 @@ def get_document(config: RunnableConfig, document_id: int):
     """Get the details of a document by id"""
     metadata = config.get('configurable') or config.get('metadata')
     user_id = metadata.get('user_id')
+
+    has_perms = async_to_sync(permit.check)(f"{user_id}", "read", "document")
+    if not has_perms:
+        raise Exception("You do not have permission to get individual documents")
+
     try:
-        document = Document.objects.get(
-            id=document_id, owner_id=user_id, active=True)
+        document = Document.objects.get(id=document_id, active=True)
     except Document.DoesNotExist:
         return Exception("Document not found, try again")
     except Exception:
@@ -89,6 +101,10 @@ def create_document(config: RunnableConfig, title: str, content: str):
     if user_id is None:
         raise Exception("Invalid request for user")
 
+    has_perms = async_to_sync(permit.check)(f"{user_id}", "create", "document")
+    if not has_perms:
+        raise Exception("You do not have permission to create individual documents")
+
     try:
         document = Document.objects.create(
             owner_id=user_id, title=title, content=content, active=True)
@@ -114,6 +130,10 @@ def delete_document(config: RunnableConfig, document_id: int):
 
     if user_id is None:
         raise Exception("Invalid request for user")
+
+    has_perms = async_to_sync(permit.check)(f"{user_id}", "delete", "document")
+    if not has_perms:
+        raise Exception("You do not have permission to delete individual documents")
 
     try:
         doc_obj = Document.objects.get(
@@ -147,6 +167,10 @@ def update_document(config: RunnableConfig, document_id: int, title: str = None,
 
     if user_id is None:
         raise Exception("Invalid request for user")
+
+    has_perms = async_to_sync(permit.check)(f"{user_id}", "update", "document")
+    if not has_perms:
+        raise Exception("You do not have permission to update individual documents")
 
     try:
         doc_obj = Document.objects.get(
