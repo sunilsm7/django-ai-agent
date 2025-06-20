@@ -129,6 +129,7 @@ GOOGLE_API_KEY = config("GOOGLE_API_KEY", default=None)
 AZURE_OPENAI_API_KEY = config("AZURE_OPENAI_API_KEY", default=None)
 AZURE_OPENAI_ENDPOINT = config("AZURE_OPENAI_ENDPOINT", default=None)
 OPENAI_API_VERSION = config("OPENAI_API_VERSION", default=None)
+DEEPSEEK_API_KEY = config("DEEPSEEK_API_KEY", default=None)
 
 TMDB_API_KEY = config("TMDB_API_KEY", default=None)
 PERMIT_API_KEY = config("PERMIT_API_KEY", default=None)
