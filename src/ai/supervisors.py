@@ -1,4 +1,3 @@
-from langchain_openai import ChatOpenAI
 from langgraph_supervisor import create_supervisor
 
 from ai import agents

@@ -1,6 +1,7 @@
 from django.conf import settings
 from langchain_openai import ChatOpenAI
 from langchain_deepseek import ChatDeepSeek
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 
 class AIModelProvider:
@@ -11,7 +12,7 @@ class AIModelProvider:
         "anthropic": settings.ANTHROPIC_API_KEY,
         "google": settings.GOOGLE_API_KEY,
         "azure": settings.AZURE_OPENAI_API_KEY,
-        "llama3": "",
+        "ollama": "",
         "deepseek": settings.DEEPSEEK_API_KEY,
     }
 
@@ -25,7 +26,7 @@ class AIModelProvider:
         "deepseek": "deepseek-chat"
     }
 
-    DEFAULT_PROVIDER = "deepseek"
+    DEFAULT_PROVIDER = "google"
 
     @classmethod
     def get_model(cls, provider=None, model_name=None, **kwargs):
@@ -58,6 +59,8 @@ class AIModelProvider:
 
         if provider == "deepseek":
             return ChatDeepSeek(**model_params)
+        elif provider == "google":
+            return ChatGoogleGenerativeAI(**model_params)
         else:
             return ChatOpenAI(**model_params)
 
